@@ -1,0 +1,24 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "backend for sreality.cz scraper",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/app.js",
+    "dev": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ondřej Pilous",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.7.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@types/pg-promise": "^5.4.3",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "pg-promise": "^11.5.4",
+    "puppeteer": "^21.3.6"
+  }
+}

@@ -1,0 +1,26 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: "not_a_password_1234"
+    ports:
+      - "5432:5432"
+
+  node_app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "23450:23450"
+    depends_on:
+      - postgres
+
+  react_app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - node_app
