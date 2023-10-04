@@ -10,60 +10,74 @@ type SrealityOffer = {
 
 async function scrape(): Promise<SrealityOffer[]> {
   console.log("Scraping started");
-  const offerArr: SrealityOffer[] = [];
 
   process.env.DBUS_SESSION_BUS_ADDRESS = "";
 
-  return (async () => {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        "--no-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-        "--unlimited-storage",
-        "--disable-setuid-sandbox",
-      ],
-      defaultViewport: null,
-      executablePath: "/usr/bin/google-chrome",
-    });
+  return await scrapeProcess();
+}
 
-    const page = await browser.newPage();
-    await page.goto("https://www.sreality.cz/hledani/prodej/byty", {
-      waitUntil: "domcontentloaded",
-    });
+async function scrapeProcess(): Promise<SrealityOffer[]> {
+  const offerArr: SrealityOffer[] = [];
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: [
+      "--no-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--unlimited-storage",
+      "--disable-setuid-sandbox",
+    ],
+    defaultViewport: null,
+    executablePath: "/usr/bin/google-chrome",
+  });
 
-    const userAgent =
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36";
+  const page = await browser.newPage();
+  await page.goto("https://www.sreality.cz/hledani/prodej/byty", {
+    waitUntil: "domcontentloaded",
+  });
 
-    await page.setUserAgent(userAgent);
+  const userAgent =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36";
 
-    console.log("Scraping initialized");
+  await page.setUserAgent(userAgent);
 
-    let count: number = 0;
+  console.log("Scraping initialized");
 
-    const nextBtnSel: string = ".btn-paging-pn.icof.icon-arr-right.paging-next";
+  let count: number = 0;
 
-    const offersListSel: string[] = [
-      ".dir-property-list",
-      "#page-layout > div.content-cover > div.content-inner > div.transcluded-content.ng-scope > div > div > div > div > div:nth-child(4) > div",
-    ];
+  const nextBtnSel: string = ".btn-paging-pn.icof.icon-arr-right.paging-next";
 
-    try {
-      await page.waitForSelector(offersListSel[0], { timeout: 10000 });
-    } catch {
-      await page.waitForSelector(offersListSel[1], { timeout: 10000 });
-    }
-
-    console.log("dir-property-list found");
-
+  const offersListSel: string[] = [
+    ".dir-property-list",
+    "#page-layout > div.content-cover > div.content-inner > div.transcluded-content.ng-scope > div > div > div > div > div:nth-child(4) > div",
+  ];
+  try {
     while (true) {
-      const offers = await page.$$(`${offersListSel} > .property.ng-scope`);
+      let located: boolean = false;
+      while (!located) {
+        var offers: any = {};
+        try {
+          await page.waitForSelector(offersListSel[0], { timeout: 10000 });
+          // console.log("dir-property-list found");
+          try {
+            offers = await page.$$(`${offersListSel} > .property.ng-scope`);
+            // console.log("The offers are loaded");
+            located = true;
+          } catch (err) {
+            console.log("Could not find the right elements: " + err);
+          }
+        } catch (err:any) {
+          console.error("ERROR: " + err.message);
+        }
+      }
+      // console.log("Offers on the page loaded");
 
       for (const singleOffer of offers) {
-        if (count > 499) {
-          await browser.close();
-          return null;
+        // let percent : number = 2500/count;
+        // console.log("Crunching the offers. Done by " + percent + "%");
+        if (count > /*499*/ 80) {
+          console.log("Scraping done, ending cycle");
+          return offerArr;
         }
 
         try {
@@ -106,7 +120,7 @@ async function scrape(): Promise<SrealityOffer[]> {
 
           offerArr.push(property);
         } catch (error) {
-          console.error(error);
+          console.error("Error during data scraping" + error);
         }
       }
 
@@ -123,13 +137,14 @@ async function scrape(): Promise<SrealityOffer[]> {
 
       await page.goto(`https://sreality.cz/${nextPage}`);
     }
-  })().then(() => {
+  } catch (err) {
+    console.error("Error while scraping: " + err);
+  } finally {
     const jsonString = JSON.stringify(offerArr, null, 2);
     fs.writeFileSync("sreality_dump.json", jsonString, "utf-8");
     console.log("scraping done");
-
     return offerArr;
-  });
+  }
 }
 
 export default scrape;

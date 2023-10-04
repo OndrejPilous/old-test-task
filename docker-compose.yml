@@ -12,15 +12,16 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "23450:23450"
+      - "8080:8080" 
+     # - "23450:23450"
     depends_on:
       - postgres
 
-  react_app:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - node_app
+  # react_app:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - node_app

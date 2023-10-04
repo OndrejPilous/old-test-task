@@ -1,43 +1,67 @@
-import scrape from "./scrape";
+const pgp = require("pg-promise")();
 
-const {pgp, connect} = require ("./db_connect");
+const dbConfig = {
+  host: "host.docker.internal",
+  port: 5432,
+  database: "postgres",
+  user: "postgres",
+  password: "not_a_password_1234",
+};
+let db: any = null;
+let db_initiliazed: boolean = false;
 
-function db_init() {
-
-  // initial setup for database
-  const table = new pgp.helpers.TableName({
-    table: "sreality_offers",
-    schema: "public",
-  });
-
+async function db_init() {
+  let retryCount = 0;
+  const retryMax = 5;
   const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS ${table} (
+    CREATE TABLE IF NOT EXISTS sreality_offers (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255),
         address VARCHAR(255),
         price VARCHAR(255),
         img VARCHAR(255)
     );
-`;
+  `;
 
-  // execute querry
-    connect().then((connection : any) => {
-        return connection
-          .none(createTableQuery) // Create table
-          .then(() => {
-            console.log("Table created successfully.");
-            //scrape();
-          })
-          .catch((error : Error) => {
-            console.error("Error creating table:", error);
-          })
-          .finally(() => {
-            if (connection) connection.done(); // Release the connection
-          });
-      })
-      .catch((error : Error) => {
-        console.error("Error connecting to the database:", error);
-      });
-}
+  while (retryCount < retryMax) {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    try {
+      if (db===null || !db_initiliazed) {
+        console.log("Configuring connection to the database");
+        db = await pgp(dbConfig);
+        db_initiliazed=true;
+        console.log("connection data => "+db);
+      }
+      // table setup
+      try {
+      const res = await db.query(createTableQuery);
+      console.log("Table created successfully.");
+      return db;
+    } catch (err:any) {
+      console.error("something went wrong during the table generation: "+err.message);
+    }
+    } catch (err: any) {
+      console.error("Error during DB setup " + err.message);
+      if (retryCount < retryMax) {
+        console.log(
+          `Retrying in 5 seconds (Attempt ${retryCount + 1}/${retryMax})`
+        );
+        if (db_initiliazed){
+          db = null;
+          db_initiliazed=false;
+        }
+      } else {
+        console.error(
+          "error duting DB setup, and retries failed. Reason:  " + err.message
+          );
+          throw err; // If max retries reached, throw the error
+        }
+      }
+    }
+    retryCount++;
+  }
 
-export default db_init;
+module.exports = {
+  db,
+  db_init,
+};

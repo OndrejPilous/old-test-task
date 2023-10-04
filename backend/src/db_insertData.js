@@ -1,14 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { connect } = require("./db_connect");
-async function insertData(data, connect) {
+const insertQuery = "INSERT INTO sreality_offers(title, address, price, img) VALUES($1, $2, $3, $4)";
+async function insertData(data, database) {
     try {
-        connect.none("INSERT INTO sreality_offers(title, address, price, img) VALUES($1, $2, $3, $4)", [data.title, data.address, data.price, data.img]);
+        database.query(insertQuery, [data.title, data.address, data.price, data.img]);
+        // console.log("data insert succesful");
+        // console.log(
+        //   "data inserted: " +
+        //     data.title +
+        //     "\n" +
+        //     data.address +
+        //     "\n" +
+        //     data.price +
+        //     "\n" +
+        //     data.img
+        // );
     }
-    catch (error) {
-        console.error("Error inserting data");
-        throw new Error("Error inserting data:", error.message);
+    catch (err) {
+        console.error("Error occured during data insertion to the database. ERROR: " +
+            err.message);
     }
 }
-// Call the insertData function with the data to insert
 exports.default = insertData;

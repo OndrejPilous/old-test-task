@@ -1,20 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const { connect } = require("./db_connect");
-async function getData(page = 1, pageSize = 20) {
-    console.log("Getting data! Received page:", page, "pageSize:", pageSize);
-    let connection = null;
+async function getData(page = 1, pageSize = 20, database) {
+    console.log("Getting data. Received page:", page, "pageSize:", pageSize);
+    const offset = (page - 1) * pageSize;
     try {
-        connection = await connect();
-        console.log("Connected to database");
-        const offset = (page - 1) * pageSize;
-        const data = await connection.any("SELECT * FROM sreality_offers ORDER BY id OFFSET $1 LIMIT $2", [offset, pageSize]);
+        const getDataQuery = `SELECT * FROM sreality_offers ORDER BY id OFFSET ${offset} LIMIT ${pageSize}`; //different aproach than in the insertData. Somehow the other one didnt work
+        let res = database.query(getDataQuery);
         console.log("Received output from the database");
-        return data;
+        return res;
     }
-    catch (error) {
-        console.error("Error in getData:", error);
-        throw error;
+    catch (err) {
+        console.error("Something went wrong during getData" + err.message);
     }
+    return [];
 }
 exports.default = getData;

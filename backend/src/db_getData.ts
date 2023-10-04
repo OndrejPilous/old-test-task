@@ -1,5 +1,3 @@
-const { connect } = require("./db_connect");
-
 interface SrealityOffer {
   title: string;
   address: string;
@@ -7,28 +5,24 @@ interface SrealityOffer {
   img: string;
 }
 
-async function getData(page: number=1, pageSize: number=20): Promise<SrealityOffer[]> {
-  console.log("Getting data! Received page:", page, "pageSize:", pageSize);
+async function getData(
+  page: number = 1,
+  pageSize: number = 20,
+  database: any
+): Promise<SrealityOffer[]> {
+  console.log("Getting data. Received page:", page, "pageSize:", pageSize);
 
-  let connection = null;
+  const offset = (page - 1) * pageSize;
   try {
-    connection = await connect();
-
-    console.log("Connected to database");
-    const offset = (page - 1) * pageSize;
-
-    const data = await connection.any(
-      "SELECT * FROM sreality_offers ORDER BY id OFFSET $1 LIMIT $2",
-      [offset, pageSize]
-    );
-
+    const getDataQuery =
+      `SELECT * FROM sreality_offers ORDER BY id OFFSET ${offset} LIMIT ${pageSize}`; //different aproach than in the insertData. Somehow the other one didnt work
+    let res = database.query(getDataQuery);
     console.log("Received output from the database");
-
-    return data;
-  } catch (error: any) {
-    console.error("Error in getData:", error);
-    throw error;
+    return res;
+  } catch (err: any) {
+    console.error("Something went wrong during getData" + err.message);
   }
+  return [];
 }
 
 export default getData;
