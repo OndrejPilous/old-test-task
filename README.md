@@ -9,7 +9,7 @@ ge. Use Typescript and React for implementation
 
 sreality.cz - http://sreality.cz/
 probably the meant data - https://www.sreality.cz/hledani/byty
-the action of changing pages is not network related - nohttps://www.sreality.cz/hledani/prodej/byty?strana=2
+the action of changing pages is not network related - https://www.sreality.cz/hledani/prodej/byty?strana=2
 
 ## stack
 
