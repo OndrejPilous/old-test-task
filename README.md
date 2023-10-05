@@ -25,6 +25,8 @@ Database: PostgreSQL
 ## notes
 This is rough version. It works but there are definetly ways to improve, comment and bug test.
 
+Also because of time sensitivity I didn't have time to implement some sort of loading screen. So it is needed to wait for scraping to finish and perhaps refresh the page. Saidly I didn't have time to test it.
+
 The goal was writen very open way so I picked some ways I found interesting and practical.
 
 I've never done similar project and learned a lot.
