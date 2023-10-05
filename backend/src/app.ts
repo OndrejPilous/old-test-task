@@ -4,7 +4,8 @@ import getData from "./db_getData";
 import insertData from "./db_insertData";
 import scrape from "./scrape";
 
-const { db, db_init } = require("./db_init");
+const { db_init } = require("./db_init");
+const cors = require('cors');
 
 const path = require("path");
 
@@ -13,6 +14,7 @@ type SrealityOffer = {
   address: string;
   price: string;
   img: string;
+  url: string;
 };
 
 let database:any = null;
@@ -20,6 +22,8 @@ let database:any = null;
 const express = require("express");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.static(path.join(__dirname, "build"))); // serves static files from the build directory
 
@@ -48,7 +52,7 @@ app.get("/api/v1/getData/", async (req: any, res: any) => {
     const data = await getData(page, pageSize, database);
     console.log("Sending data to the user");
 
-    res.status(200).send(data);
+    res.status(200).json(data);
   } catch (error) {
     console.error("Error occurred while getting data:", error);
     res.status(500).send("Error occurred while getting data");

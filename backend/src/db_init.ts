@@ -19,7 +19,8 @@ async function db_init() {
         title VARCHAR(255),
         address VARCHAR(255),
         price VARCHAR(255),
-        img VARCHAR(255)
+        img VARCHAR(255),
+        url VARCHAR(255)
     );
   `;
 
@@ -54,7 +55,6 @@ async function db_init() {
         console.error(
           "error duting DB setup, and retries failed. Reason:  " + err.message
           );
-          throw err; // If max retries reached, throw the error
         }
       }
     }

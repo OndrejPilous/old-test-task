@@ -1,4 +1,4 @@
-.App {
+.App{
   text-align: center;
   background-color: #282c34;
   min-height: 100vh;
@@ -8,4 +8,42 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+header {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wrapper {
+  width: 70vw;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin: auto;
+}
+
+main {
+  margin: auto;
+  width: 100%;
+}
+
+.offer-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 5px;
+  margin: auto;
+  justify-items: center;
+  width: 100%;
+  align-content: start;
+  grid-auto-rows: minmax(0, 1fr);
 }

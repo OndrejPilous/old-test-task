@@ -1,4 +1,5 @@
 # Luxonis test task
+This is test task for job interview
 
 ## Task
 Scrape the first 500 items (title, image url) from sreality.cz (http://sreality.cz/) (flats, sell - you can switch the web to English) and save it in the Postgresql database. Implement a simple HTTP server (or use Nginx) and show these 500 items on a nice page (with pagination) which will use your own design and put everything to single docker-compose command so that I can just run "docker-compose up" in the Github repository and see the scraped ads on http://127.0.0.1:8080 (http://127.0.0.1:8080/) pa
@@ -21,7 +22,12 @@ Back-end: node.js
 
 Database: PostgreSQL
 
-## dev log
+## notes
+This is rough version. It works but there are definetly ways to improve, comment and bug test.
 
-### backend
-- imlemented TS and managed to get express.js api "hello world" running
+The goal was writen very open way so I picked some ways I found interesting and practical.
+
+I've never done similar project and learned a lot.
+
+## end note
+Please keep in mind this is only for learning and practice purposes. Every content gathered by this application still belongs to sreality.cz. 

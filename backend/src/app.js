@@ -7,11 +7,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const db_getData_1 = __importDefault(require("./db_getData"));
 const db_insertData_1 = __importDefault(require("./db_insertData"));
 const scrape_1 = __importDefault(require("./scrape"));
-const { db, db_init } = require("./db_init");
+const { db_init } = require("./db_init");
+const cors = require('cors');
 const path = require("path");
 let database = null;
 const express = require("express");
 const app = express();
+app.use(cors());
 app.use(express.static(path.join(__dirname, "build"))); // serves static files from the build directory
 main();
 async function main() {
@@ -33,7 +35,7 @@ app.get("/api/v1/getData/", async (req, res) => {
         console.log("A request for data received");
         const data = await (0, db_getData_1.default)(page, pageSize, database);
         console.log("Sending data to the user");
-        res.status(200).send(data);
+        res.status(200).json(data);
     }
     catch (error) {
         console.error("Error occurred while getting data:", error);

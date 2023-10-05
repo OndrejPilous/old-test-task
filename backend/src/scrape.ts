@@ -6,6 +6,7 @@ type SrealityOffer = {
   address: string;
   price: string;
   img: string;
+  url: string;
 };
 
 async function scrape(): Promise<SrealityOffer[]> {
@@ -17,7 +18,7 @@ async function scrape(): Promise<SrealityOffer[]> {
 }
 
 async function scrapeProcess(): Promise<SrealityOffer[]> {
-  const offerArr: SrealityOffer[] = [];
+  let offerArr: SrealityOffer[] = [];
   const browser = await puppeteer.launch({
     headless: true,
     args: [
@@ -66,7 +67,7 @@ async function scrapeProcess(): Promise<SrealityOffer[]> {
           } catch (err) {
             console.log("Could not find the right elements: " + err);
           }
-        } catch (err:any) {
+        } catch (err: any) {
           console.error("ERROR: " + err.message);
         }
       }
@@ -75,12 +76,20 @@ async function scrapeProcess(): Promise<SrealityOffer[]> {
       for (const singleOffer of offers) {
         // let percent : number = 2500/count;
         // console.log("Crunching the offers. Done by " + percent + "%");
-        if (count > /*499*/ 80) {
+        if (offerArr.length > 499) {
           console.log("Scraping done, ending cycle");
           return offerArr;
         }
 
         try {
+          const relativePath = await page.evaluate(
+            (el: any) =>
+              el
+                .querySelector("div > div > span > h2 > a")
+                .getAttribute("href"),
+            singleOffer
+          );
+
           const title = await page.evaluate(
             (el: any) =>
               el.querySelector("div > div > span > h2 > a > span").textContent,
@@ -111,14 +120,18 @@ async function scrapeProcess(): Promise<SrealityOffer[]> {
 
           count++;
 
+          let url = new URL(relativePath, "https://www.sreality.cz/").href;
+
           const property: SrealityOffer = {
             title: title,
             address: address,
             price: price,
             img: imgUrl,
+            url: url,
           };
 
           offerArr.push(property);
+          offerArr = offerArr.filter(isUnique);
         } catch (error) {
           console.error("Error during data scraping" + error);
         }
@@ -145,6 +158,10 @@ async function scrapeProcess(): Promise<SrealityOffer[]> {
     console.log("scraping done");
     return offerArr;
   }
+}
+
+function isUnique(item: any, index: any, array: any) {
+  return array.findIndex((obj: any) => obj.img === item.img) === index;
 }
 
 export default scrape;

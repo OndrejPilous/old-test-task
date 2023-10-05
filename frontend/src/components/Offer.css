@@ -1,0 +1,45 @@
+.offer {
+  width: auto;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: rgba(2, 2, 2, 0.198);
+
+  border: 1px solid #2f2f2f;
+  border-radius: 8px;
+}
+
+.offer:hover {
+  transform: scale(1.01); /* Increase size on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a slightly stronger shadow on hover */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.offer-title {
+  margin: 0 auto;
+  padding: 0 10px 10px 10px;
+  font-size: 20px;
+}
+
+.offer-img {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  padding: 5px auto;
+  object-fit: cover;
+}
+
+.offer-address {
+  font-size: 18px;
+  padding: 5px;
+}
+
+.offer-price {
+  font-size: 18px;
+  padding: 5px;
+  font-weight: bold;
+}

@@ -8,7 +8,7 @@ async function scrape() {
     return await scrapeProcess();
 }
 async function scrapeProcess() {
-    const offerArr = [];
+    let offerArr = [];
     const browser = await puppeteer.launch({
         headless: true,
         args: [
@@ -59,11 +59,14 @@ async function scrapeProcess() {
             for (const singleOffer of offers) {
                 // let percent : number = 2500/count;
                 // console.log("Crunching the offers. Done by " + percent + "%");
-                if (count > /*499*/ 80) {
+                if (offerArr.length > 499) {
                     console.log("Scraping done, ending cycle");
                     return offerArr;
                 }
                 try {
+                    const relativePath = await page.evaluate((el) => el
+                        .querySelector("div > div > span > h2 > a")
+                        .getAttribute("href"), singleOffer);
                     const title = await page.evaluate((el) => el.querySelector("div > div > span > h2 > a > span").textContent, singleOffer);
                     const address = await page.evaluate((el) => el.querySelector("div > div > span > span.locality.ng-binding")
                         .textContent, singleOffer);
@@ -73,13 +76,16 @@ async function scrapeProcess() {
                         .querySelector("preact > div > div > a:nth-child(1) > img")
                         .getAttribute("src"), singleOffer);
                     count++;
+                    let url = new URL(relativePath, "https://www.sreality.cz/").href;
                     const property = {
                         title: title,
                         address: address,
                         price: price,
                         img: imgUrl,
+                        url: url,
                     };
                     offerArr.push(property);
+                    offerArr = offerArr.filter(isUnique);
                 }
                 catch (error) {
                     console.error("Error during data scraping" + error);
@@ -101,5 +107,8 @@ async function scrapeProcess() {
         console.log("scraping done");
         return offerArr;
     }
+}
+function isUnique(item, index, array) {
+    return array.findIndex((obj) => obj.img === item.img) === index;
 }
 exports.default = scrape;

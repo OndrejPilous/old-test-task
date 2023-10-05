@@ -3,6 +3,7 @@ interface SrealityOffer {
   address: string;
   price: string;
   img: string;
+  url: string;
 }
 
 async function getData(
