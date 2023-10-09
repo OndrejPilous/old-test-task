@@ -1,8 +1,9 @@
 .pagination {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 0;
+  margin: 0px 0 20px 0;
   font-size: 18px;
   color: white;
 }
@@ -26,6 +27,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 300px;
 }
 
 .one-third {
@@ -33,8 +35,8 @@
 }
 .page-btn {
   width: 50px;
-  height: 50px;
-  border-radius: 100%;
+  height: 30px;
+  border-radius: 30%;
   display: inline-block;
   padding: 10px 20px;
   background-color: #d0d0d0;
@@ -44,7 +46,7 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
   text-decoration: none;
-  margin: auto 10px;
+  margin: auto 20px;
   font-weight: 600;
   scale: 0.85;
 }

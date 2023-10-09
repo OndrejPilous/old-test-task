@@ -1,6 +1,6 @@
-.App{
+.App {
   text-align: center;
-  background-color: #282c34;
+  background-color: #8D9CA4;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -20,6 +20,23 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  text-transform: uppercase;
+  margin: 50px auto 30px auto;
+}
+
+footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  height: 160px;
+  width: 100%;
+}
+
+.header-active {
+  position: absolute !important;
+  top: 5%;
 }
 
 .wrapper {
@@ -40,10 +57,37 @@ main {
 .offer-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 5px;
+  gap: 25px;
   margin: auto;
   justify-items: center;
   width: 100%;
   align-content: start;
   grid-auto-rows: minmax(0, 1fr);
+  row-gap: 80px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#logo {
+  width: 250px;
+  height: 250px;
+  animation: spin 2s linear infinite;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: absolute;
+  top: 54%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

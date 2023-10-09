@@ -18,10 +18,17 @@ const Offer: React.FC<SrealityOffer> = ({
   return (
     <a href={url}>
       <div className="offer">
-        <h3 className="offer-title">{title}</h3>
+        <div className="offer-title-wrapper">
+          <h3 className="offer-title">{title}</h3>
+          <div className="lil-triangle"></div>
+        </div>
         <img className="offer-img" src={img} alt={title} />
-        <span className="offer-address">{address}</span>
-        <span className="offer-price">{price}</span>
+        <div className="offer-bottom-wrapper">
+          <div className="offer-bottom">
+            <span className="offer-address">{address}</span>
+            <span className="offer-price">{price}</span>
+          </div>
+        </div>
       </div>
     </a>
   );

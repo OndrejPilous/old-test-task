@@ -28,7 +28,7 @@ const Pagination: React.FC<PaginationProps> = ({
         >
           {"<"}
         </button>
-        <span>
+        <span className="pagination-page-count">
           Page {currentPage} of {totalPages}
         </span>
         <button
