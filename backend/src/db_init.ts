@@ -10,58 +10,60 @@ const dbConfig = {
 let db: any = null;
 let db_initiliazed: boolean = false;
 
+const createTableQuery = `
+  CREATE TABLE IF NOT EXISTS sreality_offers (
+      id SERIAL PRIMARY KEY,
+      title VARCHAR(255),
+      address VARCHAR(255),
+      price VARCHAR(255),
+      img VARCHAR(255),
+      url VARCHAR(255)
+  );
+`;
+
 async function db_init() {
   let retryCount = 0;
   const retryMax = 5;
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS sreality_offers (
-        id SERIAL PRIMARY KEY,
-        title VARCHAR(255),
-        address VARCHAR(255),
-        price VARCHAR(255),
-        img VARCHAR(255),
-        url VARCHAR(255)
-    );
-  `;
 
   while (retryCount < retryMax) {
     await new Promise((resolve) => setTimeout(resolve, 5000));
     try {
-      if (db===null || !db_initiliazed) {
+      if (db === null || !db_initiliazed) {
         console.log("Configuring connection to the database");
         db = await pgp(dbConfig);
-        db_initiliazed=true;
-        console.log("connection data => "+db);
+        db_initiliazed = true;
+        console.log("connection data => " + db);
       }
-      // table setup
+
+      // Create table if it doesn't exist
       try {
-      const res = await db.query(createTableQuery);
-      console.log("Table created successfully.");
-      return db;
-    } catch (err:any) {
-      console.error("something went wrong during the table generation: "+err.message);
-    }
+        await db.query(createTableQuery);
+        console.log("Table created successfully.");
+        return db;
+      } catch (err: any) {
+        console.error(
+          "something went wrong during the table generation: " + err.message
+        );
+      }
     } catch (err: any) {
       console.error("Error during DB setup " + err.message);
       if (retryCount < retryMax) {
         console.log(
           `Retrying in 5 seconds (Attempt ${retryCount + 1}/${retryMax})`
         );
-        if (db_initiliazed){
+        if (db_initiliazed) {
           db = null;
-          db_initiliazed=false;
+          db_initiliazed = false;
         }
       } else {
         console.error(
-          "error duting DB setup, and retries failed. Reason:  " + err.message
-          );
-        }
+          "Error duting DB setup, and retries failed. Reason:  " + err.message
+        );
       }
     }
     retryCount++;
   }
+  throw new Error("Failed to initialize the database after multiple retries.");
+}
 
-module.exports = {
-  db,
-  db_init,
-};
+export default db_init;

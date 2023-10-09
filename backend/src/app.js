@@ -7,24 +7,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const db_getData_1 = __importDefault(require("./db_getData"));
 const db_insertData_1 = __importDefault(require("./db_insertData"));
 const scrape_1 = __importDefault(require("./scrape"));
-const { db_init } = require("./db_init");
-const cors = require('cors');
-const path = require("path");
+const db_init_1 = __importDefault(require("./db_init"));
+const path_1 = __importDefault(require("path"));
+const cors_1 = __importDefault(require("cors"));
+const express_1 = __importDefault(require("express"));
+const app = (0, express_1.default)();
+// Enable CORS for your API
+app.use((0, cors_1.default)());
+// Serve static files from the 'build' directory
+app.use(express_1.default.static(path_1.default.join(__dirname, "build")));
+;
 let database = null;
-const express = require("express");
-const app = express();
-app.use(cors());
-app.use(express.static(path.join(__dirname, "build"))); // serves static files from the build directory
-main();
 async function main() {
     try {
-        database = await db_init();
+        database = await (0, db_init_1.default)();
         await scrapeAndInsertData(database);
     }
     catch (err) {
         console.log("error during application - " + err.message);
     }
 }
+main();
 app.get("/api", (req, res) => {
     res.send("Hello, Express!");
 });
@@ -43,7 +46,7 @@ app.get("/api/v1/getData/", async (req, res) => {
     }
 });
 app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "build", "index.html"));
+    res.sendFile(path_1.default.join(__dirname, "build", "index.html"));
 });
 const PORT = 8080;
 app.listen(PORT, () => {
@@ -59,8 +62,8 @@ async function scrapeAndInsertData(database) {
         const offers = await (0, scrape_1.default)();
         while (retryCount < maxRetries) {
             try {
-                for (const off of offers) {
-                    await (0, db_insertData_1.default)(off, database);
+                for (const offer of offers) {
+                    await (0, db_insertData_1.default)(offer, database);
                 }
                 console.log("Connection to DB was successful, and data inserted");
                 return;

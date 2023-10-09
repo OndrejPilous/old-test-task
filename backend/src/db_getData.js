@@ -4,14 +4,24 @@ async function getData(page = 1, pageSize = 20, database) {
     console.log("Getting data. Received page:", page, "pageSize:", pageSize);
     const offset = (page - 1) * pageSize;
     try {
-        const getDataQuery = `SELECT * FROM sreality_offers ORDER BY id OFFSET ${offset} LIMIT ${pageSize}`; //different aproach than in the insertData. Somehow the other one didnt work
-        let res = database.query(getDataQuery);
+        const getDataQuery = `SELECT * FROM sreality_offers ORDER BY id OFFSET $1 LIMIT $2`; //different aproach than in the insertData. Somehow the other one didnt work
+        const res = await database.query(getDataQuery, [
+            offset,
+            pageSize,
+        ]);
         console.log("Received output from the database");
-        return res;
+        // Ensure that the query was successful before returning the data
+        if (res) {
+            return res;
+        }
+        else {
+            console.error("No data received from the database query.");
+            throw new Error("No data received from the database query.");
+        }
     }
     catch (err) {
-        console.error("Something went wrong during getData" + err.message);
+        console.error("Something went wrong during getData:", err.message);
+        throw new Error("Error getting data from the database.");
     }
-    return [];
 }
 exports.default = getData;

@@ -1,17 +1,18 @@
-const puppeteer = require("puppeteer");
-const fs = require("fs");
+import puppeteer from "puppeteer";
+import fs from "fs";
 
-type SrealityOffer = {
+interface SrealityOffer {
   title: string;
   address: string;
   price: string;
   img: string;
   url: string;
-};
+}
 
 async function scrape(): Promise<SrealityOffer[]> {
   console.log("Scraping started");
 
+  // Prevent issues with DBUS_SESSION_BUS_ADDRESS
   process.env.DBUS_SESSION_BUS_ADDRESS = "";
 
   return await scrapeProcess();
@@ -59,10 +60,8 @@ async function scrapeProcess(): Promise<SrealityOffer[]> {
         var offers: any = {};
         try {
           await page.waitForSelector(offersListSel[0], { timeout: 10000 });
-          // console.log("dir-property-list found");
           try {
             offers = await page.$$(`${offersListSel} > .property.ng-scope`);
-            // console.log("The offers are loaded");
             located = true;
           } catch (err) {
             console.log("Could not find the right elements: " + err);
@@ -71,11 +70,8 @@ async function scrapeProcess(): Promise<SrealityOffer[]> {
           console.error("ERROR: " + err.message);
         }
       }
-      // console.log("Offers on the page loaded");
 
       for (const singleOffer of offers) {
-        // let percent : number = 2500/count;
-        // console.log("Crunching the offers. Done by " + percent + "%");
         if (offerArr.length > 499) {
           console.log("Scraping done, ending cycle");
           return offerArr;
@@ -140,8 +136,6 @@ async function scrapeProcess(): Promise<SrealityOffer[]> {
       await page.waitForSelector(nextBtnSel);
 
       let nbtnHandle = await page.$(nextBtnSel);
-
-      // console.log("trying to go to the next page");
 
       const nextPage = await page.evaluate(
         (el: any) => el.getAttribute("href"),

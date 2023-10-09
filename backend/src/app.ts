@@ -3,13 +3,21 @@
 import getData from "./db_getData";
 import insertData from "./db_insertData";
 import scrape from "./scrape";
+import db_init from "./db_init";
+import path from "path";
+import cors from "cors";
+import express from "express";
 
-const { db_init } = require("./db_init");
-const cors = require('cors');
+const app = express();
 
-const path = require("path");
+// Enable CORS for your API
+app.use(cors());
 
-type SrealityOffer = {
+// Serve static files from the 'build' directory
+app.use(express.static(path.join(__dirname, "build")));
+
+// Define a type for SrealityOffer
+interface SrealityOffer {
   title: string;
   address: string;
   price: string;
@@ -17,17 +25,8 @@ type SrealityOffer = {
   url: string;
 };
 
-let database:any = null;
 
-const express = require("express");
-
-const app = express();
-
-app.use(cors());
-
-app.use(express.static(path.join(__dirname, "build"))); // serves static files from the build directory
-
-main();
+let database: any = null;
 
 async function main() {
   try {
@@ -37,6 +36,8 @@ async function main() {
     console.log("error during application - " + err.message);
   }
 }
+
+main();
 
 app.get("/api", (req: any, res: any) => {
   res.send("Hello, Express!");
@@ -81,8 +82,8 @@ async function scrapeAndInsertData(database: any) {
 
     while (retryCount < maxRetries) {
       try {
-        for (const off of offers) {
-          await insertData(off, database);
+        for (const offer of offers) {
+          await insertData(offer, database);
         }
         console.log("Connection to DB was successful, and data inserted");
         return;

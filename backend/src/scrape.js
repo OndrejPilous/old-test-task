@@ -1,15 +1,19 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const puppeteer = require("puppeteer");
-const fs = require("fs");
+const puppeteer_1 = __importDefault(require("puppeteer"));
+const fs_1 = __importDefault(require("fs"));
 async function scrape() {
     console.log("Scraping started");
+    // Prevent issues with DBUS_SESSION_BUS_ADDRESS
     process.env.DBUS_SESSION_BUS_ADDRESS = "";
     return await scrapeProcess();
 }
 async function scrapeProcess() {
     let offerArr = [];
-    const browser = await puppeteer.launch({
+    const browser = await puppeteer_1.default.launch({
         headless: true,
         args: [
             "--no-sandbox",
@@ -41,10 +45,8 @@ async function scrapeProcess() {
                 var offers = {};
                 try {
                     await page.waitForSelector(offersListSel[0], { timeout: 10000 });
-                    // console.log("dir-property-list found");
                     try {
                         offers = await page.$$(`${offersListSel} > .property.ng-scope`);
-                        // console.log("The offers are loaded");
                         located = true;
                     }
                     catch (err) {
@@ -55,10 +57,7 @@ async function scrapeProcess() {
                     console.error("ERROR: " + err.message);
                 }
             }
-            // console.log("Offers on the page loaded");
             for (const singleOffer of offers) {
-                // let percent : number = 2500/count;
-                // console.log("Crunching the offers. Done by " + percent + "%");
                 if (offerArr.length > 499) {
                     console.log("Scraping done, ending cycle");
                     return offerArr;
@@ -93,7 +92,6 @@ async function scrapeProcess() {
             }
             await page.waitForSelector(nextBtnSel);
             let nbtnHandle = await page.$(nextBtnSel);
-            // console.log("trying to go to the next page");
             const nextPage = await page.evaluate((el) => el.getAttribute("href"), nbtnHandle);
             await page.goto(`https://sreality.cz/${nextPage}`);
         }
@@ -103,7 +101,7 @@ async function scrapeProcess() {
     }
     finally {
         const jsonString = JSON.stringify(offerArr, null, 2);
-        fs.writeFileSync("sreality_dump.json", jsonString, "utf-8");
+        fs_1.default.writeFileSync("sreality_dump.json", jsonString, "utf-8");
         console.log("scraping done");
         return offerArr;
     }

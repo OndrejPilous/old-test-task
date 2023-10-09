@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const pgp = require("pg-promise")();
 const dbConfig = {
     host: "host.docker.internal",
@@ -9,19 +10,19 @@ const dbConfig = {
 };
 let db = null;
 let db_initiliazed = false;
+const createTableQuery = `
+  CREATE TABLE IF NOT EXISTS sreality_offers (
+      id SERIAL PRIMARY KEY,
+      title VARCHAR(255),
+      address VARCHAR(255),
+      price VARCHAR(255),
+      img VARCHAR(255),
+      url VARCHAR(255)
+  );
+`;
 async function db_init() {
     let retryCount = 0;
     const retryMax = 5;
-    const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS sreality_offers (
-        id SERIAL PRIMARY KEY,
-        title VARCHAR(255),
-        address VARCHAR(255),
-        price VARCHAR(255),
-        img VARCHAR(255),
-        url VARCHAR(255)
-    );
-  `;
     while (retryCount < retryMax) {
         await new Promise((resolve) => setTimeout(resolve, 5000));
         try {
@@ -31,9 +32,9 @@ async function db_init() {
                 db_initiliazed = true;
                 console.log("connection data => " + db);
             }
-            // table setup
+            // Create table if it doesn't exist
             try {
-                const res = await db.query(createTableQuery);
+                await db.query(createTableQuery);
                 console.log("Table created successfully.");
                 return db;
             }
@@ -51,13 +52,11 @@ async function db_init() {
                 }
             }
             else {
-                console.error("error duting DB setup, and retries failed. Reason:  " + err.message);
+                console.error("Error duting DB setup, and retries failed. Reason:  " + err.message);
             }
         }
+        retryCount++;
     }
-    retryCount++;
+    throw new Error("Failed to initialize the database after multiple retries.");
 }
-module.exports = {
-    db,
-    db_init,
-};
+exports.default = db_init;
